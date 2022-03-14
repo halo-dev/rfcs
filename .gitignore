@@ -1,0 +1,12 @@
+# Dependencies
+/node_modules
+
+# Misc
+.DS_Store
+
+# Editor
+.idea
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

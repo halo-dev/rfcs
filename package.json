@@ -1,0 +1,24 @@
+{
+  "name": "@halo-dev/rfcs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "markdownlint-cli2 '**/*.md' '#node_modules'",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/halo-dev/rfcs.git"
+  },
+  "author": "halo-dev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/halo-dev/rfcs/issues"
+  },
+  "homepage": "https://github.com/halo-dev/rfcs#readme",
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "markdownlint": "^0.25.1",
+    "markdownlint-cli2": "^0.4.0"
+  }
+}
