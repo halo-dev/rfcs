@@ -160,7 +160,7 @@ public class ApiScope {
 
 
 
-![authentication processing filter](./assets/abstractauthenticationprocessingfilter.png)
+![authentication processing filter](https://docs.spring.io/spring-security/reference/_images/servlet/authentication/architecture/abstractauthenticationprocessingfilter.png)
 
 权限分配示例：
 
