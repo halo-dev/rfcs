@@ -1,3 +1,16 @@
+## 动机
+
+在安全性方面，为了防止请求伪造和数据泄露经常需要很多加密方式来阻止这一切，Halo也如此，我们需要一种更为安全的方式来传输数据和身份验证。
+
+## 目标和非目标
+
+- 提出针对后台用户身份确认的密钥机密机制
+- 提出针对自定义API token的安全的验证机制
+- 提出用户密码的机密方式，防止密码泄露
+- 提出一种可以减少伪造密钥对系统资源占用的方案
+
+## 设计
+
 ### Api token
 
 如果用户不配置`salt`则在安装时在工作空间创建名为`apiToken.salt`的文件，使用如下代码生成`salt`。
@@ -119,3 +132,10 @@ public void test() {
 }
 ```
 
+## 考虑的替代方案
+
+[Generate a Secure Random](https://www.baeldung.com/java-generate-secure-password)
+
+[AES Encryption and Decryption](https://www.baeldung.com/java-aes-encryption-decryption)
+
+[Java Security Standard Algorithm Names](https://docs.oracle.com/en/java/javase/13/docs/specs/security/standard-names.html)

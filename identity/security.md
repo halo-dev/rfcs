@@ -1,5 +1,64 @@
 # Halo 中的安全性草案
 
+## 目标
+
+- 提出针对系统安全性的具体实施方案
+- 充分考虑到对安全机制的可扩展性、易用性和可维护性
+- 提出如何降低针对后续版本升级可能存在的对安全性改动难度的解决方案
+
+## 动机
+
+基于现有 Halo 1.0 基础，我们有如下需求：
+
+- Halo需要一种可以方便接入其他认证方式的安全性机制
+- 需要一种可以同时兼容 API key 和 basic 认证的解决方案
+- 需要可以灵活创建 API Key
+- 需要一种简单分配权限的机制
+- 要考虑到自定义API和插件API的有效认证和授权
+- 可以针对不同的使用场景分配不同的API Key
+
+## 设计
+
+### 技术选择
+
+本设计方案使用 Spring securtiy来实现基于 Scope 的访问控制。
+
+相比与其他授权方式:
+
+- [基于角色的权限控制（RBAC）](https://en.wikipedia.org/wiki/Role-based_access_control)
+- [基于表达式的访问控制 (EBAC)](https://docs.spring.io/spring-security/site/docs/5.0.7.RELEASE/reference/html/el-access.html)
+- [基于属性的访问控制 (ABAC)](https://en.wikipedia.org/wiki/Attribute-based_access_control)
+
+基于 Scope 的访问控制是在Spring security 提供的基于表达式的访问控制的基础上进行缩减的具体实现方案。
+
+如果需要的话它可以随时扩充到 EBAC。
+
+使用Spring Security实现的基于 Scope 的访问控制有如下优点：
+
+- 可以实现 细粒度的访问控制
+- 没有 ABAC 实现起来复杂
+- 可以与 ABAC 同时使用
+- 可以通过绑定角色的方式来分配Scope
+- 分配权限更简单
+- 如果有特殊需求可以使用`SecurityExpressionRoot`提供的其他表达式能力
+
+用于表达式判断的 root 类，为 SecurityExpressionRoot。以下是常见的 EL 表达式，对 web 和方法都适用：
+
+1. hasRole([role])
+2. hasAnyRole([role1,role2])
+3. hasAuthority([authority])
+4. hasAnyAuthority([authority1,authority2])
+5. principal 允许直接访问当前用户信息
+6. authentication 允许直接访问当前认证对象
+7. permitAll
+8. denyAll
+9. isAnonymous()
+10. isRememberMe（）
+11. hasPermission (Object target, Object permission)，访问给定对象的特定权限，例如 hasPermission (domainObject, 'read')
+12. hasPermission (Object targetId, String targetType, Object permission)，例如，hasPermission (1, 'com.example.domain.Message', 'read')
+
+如果还想了解 ABAC与RBAC的优缺点差异可以参考： [attribute-based-access-control](https://www.immuta.com/articles/attribute-based-access-control/)
+
 ### 用户
 
 用户层面，实现多用户功能
@@ -165,3 +224,4 @@ public class ApiScope {
 权限分配示例：
 
 ![IMAGE 2022-03-14 15:54:49](./assets/158128456-ef984faa-bff6-4b8b-aed0-c92f6ae3ddd8.jpg)
+
