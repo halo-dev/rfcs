@@ -243,6 +243,14 @@ API 资源应该使用传统的 REST 模式：
 | PATCH     | patch                                                        |
 | DELETE    | delete (for individual resources), deletecollection (for collections) |
 
+允许针对非资源端点 `/healthz` 和其子路径上发起 GET 和 POST 请求示例：
+
+```yaml
+rules:
+  - nonResourceURLs: ["/healthz", "/healthz/*"] # nonResourceURL 中的 '*' 是一个全局通配符
+    verbs: ["get", "post"]
+```
+
 #### RoleBinding
 
 角色绑定（Role Binding）是将角色中定义的权限赋予一个或者一组用户。 它包含若干 **主体**（用户、组或服务账户）的列表和对这些主体所获得的角色的引用。 
