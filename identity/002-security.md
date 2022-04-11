@@ -207,9 +207,9 @@ Halo API 的一般风格是 `RESTful`——客户端通过标准 HTTP 动词（P
 - **Resource** - 系统实体的表示，通过 HTTP 以 JSON 形式发送或检索到服务器。资源通过以下方式公开：
   - 集合 - 相同类型的资源列表，可能是可查询的
   - 元素 - 单个资源，可通过 URL 寻址
-- **API Group** - 表示一组被暴露在一起的资源以及在“apiverion”字段中暴露的版本，如“GROUP/VERSION”为“halo.run/v1”
+- **API Group** - 表示一组被暴露在一起的资源以及在“apiversion”字段中暴露的版本，如“GROUP/VERSION”为“halo.run/v1”
 
-- **apiVersion** - 表示一组被暴露在一起的资源以及在“apiverion”字段中暴露的版本，如“组/版本”，例如“组/版本”。“policy.k8s.io/v1”。
+- **apiVersion** - 表示一组被暴露在一起的资源以及在“apiversion”字段中暴露的版本，如“组/版本”，例如“组/版本”。“halo.run/v1”。
 
 每个资源通常接受并返回单一种类的数据。一个种类可以被反映特定用例的多个资源接受或返回。
 
