@@ -16,7 +16,8 @@
 
 ### 非目标
 
-- 暂时不考虑多版本问题
+- 允许多个模型版本共存
+- 允许模型定义者删除或修改字段
 
 ## 需求
 
@@ -159,12 +160,11 @@ interface ExtensionClient {
 ```sql
 create table if not exists halo (
   id integer auto_increment,
-  name varchar(630),
-  created bool,
+  name varchar(630), -- byte[]
+  -- created bool,
   deleted bool,
-  create_revision integer,
-  prev_revision integer,
-  value mediumblob,
+  version int,
+  value mediumblob, -- byte[]
   old_value mediumblob,
   primary key(id)
 );
@@ -172,8 +172,7 @@ create table if not exists halo (
 create index halo_name_idx on halo (name);
 create index halo_name_id_idx on halo(name, id);
 create index halo_id_deleted_idx on halo(deleted, id);
-create index halo_prev_revision_idx on halo(prev_revision);
-create index halo_name_prev_revision_idx on halo(name, prev_revision);
+create unique index halo_name_prev_revision_idx on halo(name);
 ```
 
 Value 的数据结构如下：
@@ -195,6 +194,11 @@ interface Client {
   void watch(String key, Consumer<ValueChange> consumer);
 }
 ```
+
+> 问题：根据 category id 查询所有的 posts。
+> 树形查询
+> Prefix 查询功能考虑不同数据库的兼容
+> 根据 label 进行查询
 
 ### Shema 验证设计
 
@@ -246,10 +250,34 @@ GET /apis/v1/posts/my-post/categories
 注册 Extension 后，Halo API Server 将会为它生成 Extension API，组成模式为：`/apis/<group>/<version>/<extension>/{extensionname}/<subextension>`，例如：
 
 ```shell
-GET /apis/myplugin.johnniang.me/v1alpha1/persons
-GET /apis/myplugin.johnniang.me/v1alpha1/persons/johnniang
+GET /apis/my-plugin.johnniang.me/v1alpha1/persons
+GET /apis/my-plugin.johnniang.me/v1alpha1/persons/johnniang
 ```
 
 ## 问题
 
 TBD.
+
+- Validator 调用时机
+- POC
+- 低内存实现查询
+
+- 多版本问题
+
+如果只是新增字段，可不用添加版本
+但是删除字段或者修改字段需要手写转换方法。
+我们定义好某一个版本存储到数据库中。其他版本围绕它写相互转换方法即可。
+
+类似这样的模型：
+
+v2(Spoker) <--> (v1)Hub <--> v3(Spoker)
+^
+|
+v4(Spoker)
+
+v1 和 v2 版本实体是否需要 copy 一份
+v1 和 v2 版本转换问题
+
+
+暂时不考虑多版本问题，太过于复杂，等待后续设计。
+暂时不考虑修改或删除字段
