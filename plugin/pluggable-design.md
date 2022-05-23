@@ -101,7 +101,7 @@ metadata:
 spec:
   # 'version' is a valid semantic version string (see semver.org).
   version: 0.0.1
-  requires: >=2.0.0
+  requires: ">=2.0.0"
   author: guqing
   logo: https://guqing.xyz/avatar
   pluginClass: xyz.guqing.plugin.potatoes.PotatoesApp
@@ -434,6 +434,8 @@ Reason: 根据 [描述](#描述)中关于类加载的说明，插件使用的 `P
 **如何开发一个插件**
 
 TBD.
+
+插件如何调试
 
 ##### Halo 可扩展功能
 
