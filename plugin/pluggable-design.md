@@ -109,8 +109,8 @@ spec:
    "plugin-2": 1.0.0
   # 'homepage' usually links to the GitHub repository of the plugin
   homepage: https://github.com/guqing/halo-plugin-1
-  # 'shortDescription' explains what the plugin does in only a few words
-  shortDescription: "this is a test plugin"
+  # 'displayName' explains what the plugin does in only a few words
+  displayName: "a name to show"
   description: "Tell me more about this plugin."
   license: MIT
 ```
@@ -133,7 +133,7 @@ spec:
 - `pluginClass` ： 继承了`run.halo.app.extensions.SpringPlugin`的类全限定名，用于干预插件生命周期和类扫描。
 - `pluginDependencies`: 如果依赖了其他插件则使用`pluginId:version`的格式[可选]。
 - `homepage`: 插件的主页[可选]。
-- `shortDescription`:一个简短描述告诉别人该插件的作用[可选]。
+- `displayName`:插件的显示名称。
 - `description`: 详细介绍[可选]。
 - `license`：插件遵循的软件协议[可选]。
 
