@@ -1,6 +1,6 @@
 # rfcs
 
-### 如何贡献RFC
+## 如何贡献RFC
 
 使用模板 [RFC Template](./template.md) 来撰写新功提案，然后对  [rfcs](https://github.com/halo-dev/rfcs) 仓库发起 PR。
 
