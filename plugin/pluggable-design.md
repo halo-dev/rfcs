@@ -1,8 +1,8 @@
-## 插件化功能设计
+# 插件化功能设计
 
 实现 Halo 插件化系统，以便对核心功能进行扩展，在不缺失主要功能的同时防止 core 过大。插件能力有助于社区生态的构建。
 
-### 目标
+## 目标
 
 后端插件化
 
@@ -23,12 +23,12 @@
 - 插件仓库：提供插件的打包、发布机制，提供内置的插件仓库。
 - 插件框架：提供插件开发、打包、发布相关的脚手架，提供完善的插件开发文档。
 
-### 非目标
+## 非目标
 
 - 插件安全检查。
 - 插件代码风格检查。
 
-### 背景和动机
+## 背景和动机
 
 目前 1.0 版本中社区提出了很多非普适功能的 issue，为了控制 core 的大小会挑选重要的功能进行实现， 这对使用者来说很不方便。
 包括但不限于以下 issue：
@@ -42,9 +42,9 @@
 
 该功能的实现会很大程度的提高社区活跃度并壮大社区，同时很多在 1.0 版本中加入的许多功能都可以抽取为独立插件以减小 core 的大小，用户可以根据需要选择合适的插件来达到目的。
 
-### 设计
+## 设计
 
-#### 术语
+### 术语
 
 - **Extension Point**
   - 由 Halo 定义的用于添加特定功能的接口。
@@ -54,9 +54,9 @@
 - **Extension**
   - Extension Point（扩展点）的一种具体实现。
 
-#### Backend
+### Backend
 
-##### 描述
+#### 描述
 
 插件启用时由 PluginManager 负责加载，包括 :
 
@@ -85,9 +85,9 @@
 >
 > [Oracle Chapter 2 Class Loaders](https://docs.oracle.com/cd/E19501-01/819-3659/beade/index.html)
 
-##### 资源配置
+#### 资源配置
 
-**plugin-manifest**
+**plugin-manifest：**
 
 ```yaml
 apiVersion: v1
@@ -137,7 +137,7 @@ spec:
 - `description`: 详细介绍[可选]。
 - `license`：插件遵循的软件协议[可选]。
 
-**plugin role templates**
+**plugin role templates：**
 
 如果需要对插件提供的 API 进行权限控制，可以定义 role template，当插件启用时会被加载以使用 Halo 的权限控制体系进行统一的 API 权限控制。
 
@@ -169,7 +169,7 @@ Halo 使用 [Java 插件框架 (PF4J)](https://github.com/pf4j/pf4j) 来表示�
 
 这里有一个 [PoC](https://github.com/guqing/halo-plugin-experimental/tree/main/core/src/main/java/run/halo/app/extensions)可供预览
 
-##### 定义 Extension Point
+#### 定义 Extension Point
 
 扩展点接口必须继承 `ExtensionPoint` 以表示该接口为扩展点
 
@@ -233,7 +233,7 @@ public class FileHandlers {
 }
 ```
 
-##### 生命周期方法
+#### 生命周期方法
 
 通过继承`Plugin`来表示该类为插件的主类，加载时会从此类开始并扫描此类同级目录及子目录下的类，将其加载到 Halo 中。
 
@@ -263,7 +263,7 @@ public class PotatoesApp extends Plugin {
 }
 ```
 
-##### 定义 APIs
+#### 定义 APIs
 
 使用`@RestController`和`@Controller`来声明是插件的控制器
 
@@ -288,7 +288,7 @@ public class PotatoesController {
 }
 ```
 
-##### 发布订阅
+#### 发布订阅
 
 1. 插件内部允许存在独立的事件和监听器
 
@@ -356,12 +356,12 @@ public class HaloPostVisitListener implements ApplicationListener<PostVisitEvent
 }
 ```
 
-##### 数据持久化
+#### 数据持久化
 
 通过自定义模型来完成插件数据持久化功能。
 TODO 细节待补充
 
-##### 插件版本控制 <a id="plugin-versioning"></a>
+#### 插件版本控制 <a id="plugin-versioning"></a>
 
 为了保持 Halo 生态系统的健康、可靠和安全，每次您对自己拥有的插件进行重大更新时，我们建议在遵循 [semantic versioning spec](http://semver.org/) 的基础上，发布新版本。遵循语义版本控制规范有助于其他依赖你代码的开发人员了解给定版本的更改程度，并在必要时调整自己的代码。
 
@@ -374,25 +374,25 @@ TODO 细节待补充
 | Backward compatible new features          | Minor release | 增加中间数字并将最后一位重置为零             | 1.1.0           |
 | Changes that break backward compatibility | Major release | 增加第一位数字并将中间和最后一位数字重置为零 | 2.0.0           |
 
-##### 插件依赖插件
+#### 插件依赖插件
 
 MVP(minimum viable product)版本中不实现
 
 TBD
 
-##### 插件版本更新
+#### 插件版本更新
 
 MVP(minimum viable product)版本中不实现（可先通过先卸载后安装的方式解决）
 
 TBD
 
-##### 插件工程化
+#### 插件工程化
 
 插件可以使用 Maven 或 Gradle 等项目构建工具依赖 `pluggable-suite`，该工具中提供了扩展点接口、公共接口和一些工具帮助快速构建插件。
 
 一个常见的使用 Gradle 作为构建工具的插件目录结构如下
 
-```
+```plaintext
 apples
 ├── build
 │   ├── classes
@@ -431,13 +431,13 @@ Reason: 根据 [描述](#描述)中关于类加载的说明，插件使用的 `P
 > - 在同一个命名空间中，不会出现类的完整名字（包括类的包名） 相同的两个类。
 > - 在不同的命名空间中，有可能会出现类的完整名字（包括类的包名）相同的两个类。
 
-**如何开发一个插件**
+**如何开发一个插件：**
 
 TBD.
 
 插件如何调试
 
-##### Halo 可扩展功能
+#### Halo 可扩展功能
 
 1. 附件上传的方式可以默认提供本地文件上传功能，然后通过插件扩展其他上传方式如 OSS。
 2. 针对文章、评论、上传的文件流对象等提供可扩展的对象前置和后置处理器扩展点，可实现例如数据脱敏、文件去除 EXIF 元信息等功能。
@@ -454,17 +454,17 @@ TBD.
 13. 系统日志功能通过插件实现。
 14. 插件实现小工具，如数据备份，导入导出 Markdown 或整站、导入导出 json 等。
 
-**如何调试**
+**如何调试：**
 
 TBD.
 
-#### Frontend
+### Frontend
 
 TBD
 
-#### 附录
+## 附录
 
-##### 插件启动速度优化
+### 插件启动速度优化
 
 插件启动时扫描插件类所需耗时会随着插件包层次结构的复杂度而增加，例如
 
@@ -500,7 +500,7 @@ TBD
 000275120 001% loadClass
 ```
 
-##### 插件卸载
+### 插件卸载
 
 插件卸载时要:
 
@@ -511,7 +511,7 @@ TBD
 
 1. 启动 `Halo` 时添加 `JVM` 参数
 
-```
+```bash
 -Xlog:class+load=info -Xlog:class+unload=info
 ```
 
