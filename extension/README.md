@@ -10,13 +10,13 @@
 中完成插件机制的功能。虽然我们可以提供一些扩展点供插件使用，但是插件的自定义数据需求是必不可少的。例如，访问统计插件需要记录某些文章或者页面的 pv，uv 等，需要将数据持久化到 Halo
 中。所以，我们非常有必要设计自定义模型为插件提供数据支持。
 
-## 目标
+### 目标
 
 - 能够任意定义自定义资源，并生成对应的 schema 配置应用到 Halo Core 中。
 - 能够方便对自定义资源进行查询，获取，更新和删除操作。
 - 监听资源的变更，包括创建，更新。
 
-## 非目标
+### 非目标
 
 - 允许多个模型版本共存。
 - 允许模型定义者删除或修改字段。
@@ -325,9 +325,9 @@ class PersonValidator implements Validator<Person> {
 schema.registerValidator(new PersonValidator());
 ```
 
-## API 设计
+### API 设计
 
-### Halo Core API
+#### Halo Core API
 
 核心 API 组成模式为：`/api/<version>/<coreextension>/{extensionname}/<subextension>`。例如：
 
@@ -337,7 +337,7 @@ GET /api/v1/posts/my-post
 GET /api/v1/posts/my-post/categories
 ```
 
-### Extension API
+#### Extension API
 
 注册 Extension 后，Halo API Server 将会为它生成 Extension
 API，组成模式为：`/apis/<group>/<version>/<extension>/{extensionname}/<subextension>`，例如：
