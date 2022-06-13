@@ -11,11 +11,11 @@
 - 插件允许通过 core 提供的数据持久化机制来进行数据操作（CRUD）。
 - 插件允许调用 core 提供的公开接口对 core 的数据进行操作。
 
-前端插件化
+管理端前端插件化
 
 - 前端项目支持插件化，可通过插件在各级导航栏插入新的功能入口，实现功能页面的动态添加。
 
-- 通过固定协议加载插件中提供的前端页面或 JavaScript 来扩展前端功能。
+- 通过各个页面或组件的扩展点来实现原有功能的扩展。
 
 公共目标
 
@@ -27,6 +27,10 @@
 
 - 插件安全检查。
 - 插件代码风格检查。
+
+管理端前端：
+
+- 不适配多种前端渲染框架，仅支持与 Core 一致的技术栈（Vue）。
 
 ## 背景和动机
 
@@ -65,7 +69,7 @@
 - Static files：由 PluginClassLoader 加载。
 - 类似 manifest 和 role template 的 yaml。
 - Listeners：由 PluginApplicationContext 管理。
-- Spring bean components：委托给 PluginApplicationContext 管理。
+- Spring Bean Components：委托给 PluginApplicationContext 管理。
 - core 中标注了 `@SharedEvent` 注解的事件被发布时由 `PluginApplicationEventBridgeDispatcher` 桥接给已启用的插件使用。
 
 ![image-20220507180723198](assets/image-20220507180723198.png)
@@ -167,7 +171,7 @@ Halo 使用 [Java 插件框架 (PF4J)](https://github.com/pf4j/pf4j) 来表示�
 - 它的维护工作量最少。
 - Halo 的更新不太可能破坏你的插件。
 
-这里有一个 [PoC](https://github.com/guqing/halo-plugin-experimental/tree/main/core/src/main/java/run/halo/app/extensions)可供预览
+这里有一个 [PoC](https://github.com/guqing/halo-plugin-experimental/tree/main/core/src/main/java/run/halo/app/extensions) 可供预览
 
 #### 定义 Extension Point
 
@@ -361,7 +365,7 @@ public class HaloPostVisitListener implements ApplicationListener<PostVisitEvent
 通过自定义模型来完成插件数据持久化功能。
 TODO 细节待补充
 
-#### 插件版本控制 <a id="plugin-versioning"></a>
+#### 插件版本控制
 
 为了保持 Halo 生态系统的健康、可靠和安全，每次您对自己拥有的插件进行重大更新时，我们建议在遵循 [semantic versioning spec](http://semver.org/) 的基础上，发布新版本。遵循语义版本控制规范有助于其他依赖你代码的开发人员了解给定版本的更改程度，并在必要时调整自己的代码。
 
@@ -376,13 +380,13 @@ TODO 细节待补充
 
 #### 插件依赖插件
 
-MVP(minimum viable product)版本中不实现
+MVP(minimum viable product) 版本中不实现
 
 TBD
 
 #### 插件版本更新
 
-MVP(minimum viable product)版本中不实现（可先通过先卸载后安装的方式解决）
+MVP(minimum viable product) 版本中不实现（可先通过先卸载后安装的方式解决）
 
 TBD
 
@@ -435,9 +439,233 @@ Reason: 根据 [描述](#描述)中关于类加载的说明，插件使用的 `P
 
 TBD.
 
-插件如何调试
+**如何调试：**
 
-#### Halo 可扩展功能
+TBD.
+
+### Admin Frontend
+
+#### 名词定义
+
+1. Admin Core：Halo 管理端核心项目
+2. Monorepo：<https://pnpm.io/workspaces>
+
+#### 前置条件
+
+1. 插件应当使用与 Admin Core 的相同技术栈，即 Vue 3、Pinia、Vue Router 等。但不限制插件使用其他的三方依赖。
+
+2. Admin Core 采用 Monorepo 进行管理，将分为 `core` `@halo-dev/components` `@halo-dev/shared` 等仓库。
+
+   1. core：即 Admin Core 的相关代码。
+
+   2. @halo-dev/components：公共 UI 组件，将被 Admin Core 和各个插件依赖，且插件在构建的时候应当排除掉这个包。
+
+   3. @halo-dev/shared：公共的一些代码，其中可能包括接口请求的封装、类型定义、状态管理库等。需要被  Admin Core 和各个插件依赖，且插件在构建的时候应当排除掉这个包。
+
+3. 推荐使用 TypeScript 以获得更好的类型推断和编辑器提示，但不限制使用 JavaScript。
+
+#### 入口文件
+
+此文件作为唯一的入口，里面包含如路由、Extension Point、菜单等的定义，使用声明式的写法。此文件最终导出的应该是一个 Plugin 类型的对象。
+
+Plugin 类型定义（需要包含在 `@halo-dev/shared` 包）：
+
+```typescript
+import type { Component } from "vue";
+import type { RouteRecordRaw } from "vue-router";
+import type { MenuGroupType } from "./menu";
+import type { PostsPagePublicState } from "./post";
+import type { DashboardPublicState } from "./dashboard";
+import type { UserProfileLayoutPublicStates } from "./user";
+
+export type ExtensionPointType =
+  | "POSTS"
+  | "POST_EDITOR"
+  | "DASHBOARD"
+  | "USER_SETTINGS";
+
+export type ExtensionPointState =
+  | PostsPagePublicState
+  | DashboardPublicState
+  | UserProfileLayoutPublicStates;
+
+export interface HaloRouteRecord extends RouteRecordRaw {
+  parent?: string;
+}
+
+export interface Plugin {
+  name: string;
+
+  components: Component[];
+
+  activated?: () => void;
+
+  deactivated?: () => void;
+
+  routes?: HaloRouteRecord[];
+
+  menus?: MenuGroupType[];
+
+  extensionPoints: Record<
+    ?ExtensionPointType,
+    (state: ExtensionPointState) => void
+  >;
+}
+```
+
+入口文件示例：
+
+```typescript
+import type { Plugin } from "@halo-dev/admin-shared/src/types";
+import DefaultView from "./views/DefaultView.vue";
+import { IconGrid, VButton } from "@halo-dev/components";
+
+const plugin: Plugin = {
+  name: "PluginTemplate",
+  components: [DefaultView],
+  extensionPoints: {
+    POSTS: (state: PostsPagePublicState) => {
+      
+      const visible = ref(false);
+
+      state.actions.push({
+        component: VButton,
+        props: {
+          type: "secondary",
+        },
+        slots: {
+          default: '定时发布'
+        },
+        events: {
+          click: () => {
+            visible.value = value;
+          },
+        },
+      });
+    },
+  },
+  routes: [
+    {
+      path: "/hello-world",
+      name: "HelloWorld",
+      component: DefaultView,
+    },
+  ],
+  menus: [
+    {
+      name: "From PluginTemplate",
+      items: [
+        {
+          name: "HelloWorld",
+          path: "/hello-world",
+          icon: IconGrid,
+        },
+      ],
+    },
+  ],
+  activated() {
+    console.log("activated")
+  },
+  deactivated() {
+    console.log("deactivated")
+  },
+};
+
+export default plugin;
+```
+
+#### 路由及菜单
+
+#### Extension Point
+
+#### 网络请求
+
+由 `@halo-dev/shared` 提供 apiClient 请求模块，并且需要提供注册 Client 的方法，如：
+
+```typescript
+import { ApiClient } from '@halo-dev/admin-api'
+import apiClient from '@halo-dev/shared'
+
+class ForumClient extend ApiClient {
+  
+  constructor(client) {
+    this.client = client;
+  }
+  
+  list() {
+    return this.client.get("/apis/forums")
+  }
+  
+  delete(id: number) {
+    return this.client.delete("/apis/forums", { id })
+  }
+}
+
+apiClient.registerClient(new ForumClient());
+
+apiClient.forum.list().then(response => {
+  // TODO
+})
+
+apiClient.forum.delete({ id: 1 }).then(response => {
+    // TODO
+})
+```
+
+#### 构建方式
+
+统一采用 [Vite 的 Library 模式](https://vitejs.dev/guide/build.html#library-mode) 构建最终插件产物。如上所说，插件需要排除与 Admin Core 重复的依赖，包括但不限于 `vue`、`vue-router`、`@halo-dev/shared`、`@halo-dev/components`。另外，最终构建的 JavaScript 模块形式会在后面的插件加载部分做详细描述。
+
+> Note: 理想情况下，我们将提供一个针对于插件开发的 CLI 工具来创建插件项目，那么此时构建插件的方式就会被内置。
+
+```typescript
+import { fileURLToPath, URL } from "url";
+
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import vueJsx from "@vitejs/plugin-vue-jsx";
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [vue(), vueJsx()],
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+  build: {
+    lib: {
+      entry: "src/index.ts",
+      name: "PluginTemplate",
+      formats: ["iife"],
+      fileName: () => `halo-plugin-template.js`,
+    },
+    rollupOptions: {
+      external: ["vue", "vue-router", "@halo-dev/shared", "@halo-dev/components"],
+      output: {
+        globals: {
+          vue: "Vue",
+          "vue-router": "VueRouter",
+          "@halo-dev/components": "components",
+        },
+      },
+    },
+  },
+});
+```
+
+最终构建产物目录可能会如下所示：
+
+```plaintext
+├── halo-plugin-template.js
+└── style.css
+```
+
+#### 插件加载
+
+## 附录
+
+### Halo 可扩展功能设想
 
 1. 附件上传的方式可以默认提供本地文件上传功能，然后通过插件扩展其他上传方式如 OSS。
 2. 针对文章、评论、上传的文件流对象等提供可扩展的对象前置和后置处理器扩展点，可实现例如数据脱敏、文件去除 EXIF 元信息等功能。
@@ -453,16 +681,6 @@ TBD.
 12. 插件实现资源监控和告警等功能。
 13. 系统日志功能通过插件实现。
 14. 插件实现小工具，如数据备份，导入导出 Markdown 或整站、导入导出 json 等。
-
-**如何调试：**
-
-TBD.
-
-### Frontend
-
-TBD
-
-## 附录
 
 ### 插件启动速度优化
 
