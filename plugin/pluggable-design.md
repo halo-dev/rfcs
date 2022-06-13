@@ -663,6 +663,79 @@ export default defineConfig({
 
 #### 插件加载
 
+前置条件：
+
+1. 后端需要提供获取已启用插件的接口。
+2. 在插件工程的描述文件中，需要定义管理端前端插件所需的资源文件路径。
+
+```typescript
+import router from '@/router'
+import { registerMenu } from '@/core/menus.config'
+
+const app = createApp(App);
+
+initApp();
+
+function loadScript(src: string) {
+  return new Promise(function (resolve, reject) {
+    el = document.createElement("script");
+    el.src = src;
+
+    el.addEventListener("error", reject);
+    el.addEventListener("abort", reject);
+    el.addEventListener("load", function () {
+      resolve(el);
+    });
+    
+    document.head.prepend(el)
+  });
+}
+
+const initApp = async () => {
+  // Gets all enabled plugins
+  const enabledPlugins = await apiClient.plugins.list({ enabled: true });
+  
+  for (let i = 0; i < enabledPlugins.length; i++) {
+    const plugin = enabledPlugins[i]
+    
+    if(!plugin.assets) {
+      continue;
+    }
+    
+    try {
+      if(plugin.assets.script) {
+        await loadScript(plugin.assets.script)
+      }
+      if(plugin.assets.style) {
+        await loadStyle(plugin.assets.style)
+      }
+      
+      const pluginModule = window[plugin.assets.name];
+      
+      // register components
+      pluginModule.components.forEach(component => {
+        app.component(component.name, component);
+      })
+      
+      // register routes
+      pluginModule.routes.forEach(route => {
+        router.addRoute(route)
+      })
+      
+      // register menus
+      pluginModule.menus.forEach(menu => {
+        registerMenu(route)
+      })
+      
+      app.use(router)
+    } catch (e) {
+      // TODO needs a notification
+    }
+    app.mount('#app')
+  }
+}
+```
+
 ## 附录
 
 ### Halo 可扩展功能设想
