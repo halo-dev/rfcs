@@ -574,49 +574,11 @@ const plugin: Plugin = {
 export default plugin;
 ```
 
-#### 路由及菜单
-
-#### Extension Point
-
-#### 网络请求
-
-由 `@halo-dev/shared` 提供 apiClient 请求模块，并且需要提供注册 Client 的方法，如：
-
-```typescript
-import { ApiClient } from '@halo-dev/admin-api'
-import apiClient from '@halo-dev/shared'
-
-class ForumClient extend ApiClient {
-  
-  constructor(client) {
-    this.client = client;
-  }
-  
-  list() {
-    return this.client.get("/apis/forums")
-  }
-  
-  delete(id: number) {
-    return this.client.delete("/apis/forums", { id })
-  }
-}
-
-apiClient.registerClient(new ForumClient());
-
-apiClient.forum.list().then(response => {
-  // TODO
-})
-
-apiClient.forum.delete({ id: 1 }).then(response => {
-    // TODO
-})
-```
-
 #### 构建方式
 
 统一采用 [Vite 的 Library 模式](https://vitejs.dev/guide/build.html#library-mode) 构建最终插件产物。如上所说，插件需要排除与 Admin Core 重复的依赖，包括但不限于 `vue`、`vue-router`、`@halo-dev/shared`、`@halo-dev/components`。另外，最终构建的 JavaScript 模块形式会在后面的插件加载部分做详细描述。
 
-> Note: 理想情况下，我们将提供一个针对于插件开发的 CLI 工具来创建插件项目，那么此时构建插件的方式就会被内置。
+> Note: 理想情况下，我们可以提供一个针对于插件开发的 CLI 工具来创建插件项目，那么此时构建插件的方式就会被内置。
 
 ```typescript
 import { fileURLToPath, URL } from "url";
@@ -671,6 +633,8 @@ export default defineConfig({
 ```typescript
 import router from '@/router'
 import { registerMenu } from '@/core/menus.config'
+import { apiClient } from '@halo-dev/shared'
+import { usePluginStore } from '@/store/plugins' 
 
 const app = createApp(App);
 
@@ -690,6 +654,8 @@ function loadScript(src: string) {
     document.head.prepend(el)
   });
 }
+
+const pluginStore = usePluginStore()
 
 const initApp = async () => {
   // Gets all enabled plugins
@@ -712,6 +678,8 @@ const initApp = async () => {
       
       const pluginModule = window[plugin.assets.name];
       
+      plugin.module = pluginModule
+      
       // register components
       pluginModule.components.forEach(component => {
         app.component(component.name, component);
@@ -731,9 +699,159 @@ const initApp = async () => {
     } catch (e) {
       // TODO needs a notification
     }
+    
+    pluginStore.plugins = enabledPlugins
+    
     app.mount('#app')
   }
 }
+```
+
+详细解释：
+
+1. 在 Admin Core 的入口文件中挂载 Vue 实例前通过接口得到当前已经启用的插件。接口可能形如：`/api/admin/plugins?enabled=true`
+2. 判断是否有注册管理端前端插件的静态资源（JavaScript 入口文件等）。
+3. 通过创建 script 节点的形式动态加载 JavaScript 入口文件。
+4. 通过上方构建方式部分我们可以知道，最终构建的 JavaScript 模块为 [IIFE](https://en.wikipedia.org/wiki/Immediately_invoked_function_expression) 形式，在加载完成 JavaScript 文件之后，会将整个函数表达式对象挂载到浏览器的 [window](https://developer.mozilla.org/zh-CN/docs/Web/API/Window) 对象。最终我们就可以通过 `window[pluginId]` 的形式获取到整个插件的对象。
+5. 解析插件对象，注册 Vue 组件、路由、菜单等。
+6. 将已启用的插件集合交给 Pinia（状态管理）管理，方便后续各个页面或者组件中扩展点的使用。
+
+#### 用户权限
+
+TDB.
+
+#### Extension Point
+
+结合 Vue 数据驱动的思想，将页面或者组件中可拓展的位置使用数据动态渲染。而插件需要做的就是操作所需拓展点的数组即可。具体流程如下：
+
+1. 在页面或者组件中定义好可拓展的响应式数据，并提供一个扩展点名称。
+2. 通过上方插件加载部分我们可以知道，已启用的插件已经被放在了 Pinia 来管理，我们需要在已启用的插件里检查是否有注册当前拓展点。
+3. 执行插件中的拓展点函数。
+
+使用上方入口文件示例来举例：
+
+```typescript
+extensionPoints: {
+  POSTS: (state: PostsPagePublicState) => {
+
+    const visible = ref(false);
+
+    state.actions.push({
+      component: VButton,
+      props: {
+        type: "secondary",
+      },
+      slots: {
+        default: '定时发布'
+      },
+      events: {
+        click: () => {
+          visible.value = value;
+        },
+      },
+    });
+  },
+},
+```
+
+对应提供 `POSTS` 拓展点的页面：
+
+```vue
+<script lang="ts" setup>
+import type { PostsPagePublicState } from '@halo-dev/shared'
+import { usePluginStore } from '@/store/plugins'
+import { VButton, IconAddCircle, IconDeleteBin, VPageHeader } from '@halo-dev/components'
+  
+const state = reactive<PostsPagePublicState>({
+  actions: [
+    {
+      component: markRaw(VButton),
+      props: {
+        size: "sm",
+      },
+      slots: {
+        default: "回收站",
+        icon: IconDeleteBin,
+      },
+    },
+    {
+      component: markRaw(VButton),
+      props: {
+        type: "secondary",
+        route: { name: "PostEditor" },
+      },
+      slots: {
+        default: "新建",
+        icon: IconAddCircle,
+      },
+    },
+  ],
+  posts: posts.map((item: any) => {
+    return {
+      ...item,
+      checked: false,
+    };
+  }),
+});
+  
+const { plugins } = usePluginStore()
+
+plugins.forEach({ pluginModule } => {
+  if (!pluginModule.extensionPoints["POSTS"]) {
+    return;
+  }
+  plugin.extensionPoints["POSTS"](state);
+})
+</script>
+<template>
+  <VPageHeader>
+    <template #actions>
+      <component
+        :is="action.component"
+        v-for="(action, index) in state.actions"
+        :key="index"
+        v-bind="{ ...action.props }"
+        v-on="action.events"
+      >
+        {{ action.slots.default }}
+      </component>
+    </template>
+  </VPageHeader>
+</template>
+```
+
+#### 网络请求
+
+由 `@halo-dev/shared` 提供 apiClient 请求模块，并且需要提供注册 Client 的方法以供插件注册所需的 Client，如：
+
+```typescript
+import { ApiClient } from '@halo-dev/admin-api'
+import apiClient from '@halo-dev/shared'
+
+class ForumClient extend ApiClient {
+  
+  constructor(client) {
+    this.client = client;
+  }
+  
+  list() {
+    return this.client.get("/apis/forums")
+  }
+  
+  delete(id: number) {
+    return this.client.delete("/apis/forums", { id })
+  }
+}
+
+apiClient.registerClient(new ForumClient());
+
+apiClient.forum.list().then(response => {
+  // TODO
+})
+
+apiClient.forum.delete({ id: 1 }).then(response => {
+    // TODO
+})
 ```
 
 ## 附录
