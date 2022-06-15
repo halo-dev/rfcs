@@ -394,30 +394,55 @@ TBD
 
 插件可以使用 Maven 或 Gradle 等项目构建工具依赖 `pluggable-suite`，该工具中提供了扩展点接口、公共接口和一些工具帮助快速构建插件。
 
-一个常见的使用 Gradle 作为构建工具的插件目录结构如下
+一个常见的使用 Gradle 作为构建工具的插件目录结构如下：
 
 ```plaintext
-apples
+├── LICENSE
+├── README.md
+├── admin-frontend
+│   ├── README.md
+│   ├── env.d.ts
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── src
+│   │   ├── assets
+│   │   │   └── logo.svg
+│   │   ├── components
+│   │   │   └── HelloWorld.vue
+│   │   ├── index.ts
+│   │   ├── styles
+│   │   │   └── index.css
+│   │   └── views
+│   │       └── DefaultView.vue
+│   └── vite.config.ts
 ├── build
-│   ├── classes
-│   │   └── java
-│   │       └── main
-│   │           ├── META-INF
-│   │           │   └── plugin-components.idx
 │   ├── libs
-│   │   └── apples-1.0.0.jar
+│   │   └── halo-plugin-template-1.0-SNAPSHOT-plain.jar
+├── build.gradle
+├── gradlew
+├── gradlew.bat
+├── settings.gradle
 └── src
     └── main
         ├── java
-        │   └── xyz
-        │       └── guqing
-        │           └── plugin
-        │               └── apples
-        │                   ├── ApplesPlugin.java
+        │   └── io
+        │       └── github
+        │           └── guqing
+        │               └── template
+        │                   ├── ApplesController.java
+        │                   └── post
+        │                       ├── Post.java
+        │                       ├── PostController.java
+        │                       ├── PostRepository.java
+        │                       └── PostService.java
         └── resources
+            ├── admin
+            │   ├── halo-plugin-template.js
+            │   └── style.css
+            ├── extensions
+            │   ├── reverseproxy.yaml
+            │   └── roles.yaml
             ├── plugin.yaml
-            ├── roleTemplate.yaml
-            └── index.html
 ```
 
 插件可以引入 `pluggable-suite` 中没有提供的依赖，例如使用 `Gradle` 作为项目构建工具时，单独在插件中引入 `commons-lang3` 示例：
