@@ -484,7 +484,7 @@ TBD.
 
 1. 插件应当使用与 Admin Core 的相同技术栈，即 Vue 3、Pinia、Vue Router 等。但不限制插件使用其他的三方依赖。
 
-2. Admin Core 采用 Monorepo 进行管理，将分为 `core` `@halo-dev/components` `@halo-dev/shared` 等仓库。
+2. Admin Core 采用 Monorepo 进行管理，将分为 `core`、`@halo-dev/components`、`@halo-dev/shared` 等仓库。
 
    1. core：即 Admin Core 的相关代码。
 
