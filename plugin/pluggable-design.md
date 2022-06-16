@@ -399,7 +399,7 @@ TODO 细节待补充
 - AppleController 定义如下：
 
   ```java
-  @ApiVersion("plugins.halo.run/v1alpha1")
+  @ApiVersion("v1alpha1") // 该注解的 value 值将会作为 API 的 version 部分。“group.halo.run/v1alpha1” 和 “v1alpha1” 都将视为 “v1alpha1”。
   @RequestMapping("/apples")
   @RestController
   public class AppleController {
@@ -414,7 +414,7 @@ TODO 细节待补充
 当插件被注册时，我们将会为 AppleController 生成统一路径的 API。API 前缀组成规则如下：
 
 ```text
-/apis/{version}/plugins/{plugin-name}/**
+/api/{version}/plugins/{plugin-name}/**
 ```
 
 例如：`/api/v1alpha1/plugins/my-plugin/apples/starting`。
