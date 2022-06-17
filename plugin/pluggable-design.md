@@ -378,6 +378,83 @@ TODO 细节待补充
 | Backward compatible new features          | Minor release | 增加中间数字并将最后一位重置为零             | 1.1.0           |
 | Changes that break backward compatibility | Major release | 增加第一位数字并将中间和最后一位数字重置为零 | 2.0.0           |
 
+#### 插件自定义 API 设计
+
+插件自定义 API 应尽可能符合 Halo API 规范。且不同插件产生的 API 不会产生冲突。
+
+##### 插件自定义 API 样例
+
+我们假设：
+
+- 插件资源清单：
+
+  ```yaml
+  apiVersion: plugin.halo.run/v1alpha1
+  kind: Plugin
+  metadata:
+    name: my-plugin
+  ```
+
+- Apple 并不是插件的自定义模型
+- AppleController 定义如下：
+
+  ```java
+  @ApiVersion("v1alpha1") // 该注解的 value 值将会作为 API 的 version 部分。“group.halo.run/v1alpha1” 和 “v1alpha1” 都将视为 “v1alpha1”。
+  @RequestMapping("/apples")
+  @RestController
+  public class AppleController {
+
+      @PostMapping("/starting")
+      public void starting() {
+      }
+
+  }
+  ```
+
+当插件被注册时，我们将会为 AppleController 生成统一路径的 API。API 前缀组成规则如下：
+
+```text
+/api/{version}/plugins/{plugin-name}/**
+```
+
+例如：`/api/v1alpha1/plugins/my-plugin/apples/starting`。
+
+Role 配置样例如下：
+
+```yaml
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: apple-role
+rules:
+  # 插件自定义 API 规则配置
+  - resources: ["apples"]
+    verbs: ["create"]
+    plugin: my-plugin # 新增 plugin 字段，主要为了区分当前规则是否匹配某个插件中自定义接口。
+  # 常规规则配置
+  - apiGroups: [""]
+    resources: ["users"]
+    verbs: ["list", "get"]
+```
+
+##### API 构成讨论
+
+- [ ] `/apis/{group}/{version}/plugins/{plugin-name}/**`
+
+  由于 group 和 version 可任意指定，可能会和系统自动生成的 Plugin 的 API 冲突。例如：`/apis/plugin.halo.run/v1alpha1/plugins/my-plugin/**`。
+
+- [ ] `/apis/{plugin-name}/{version}/**`
+
+  由于 plugin-name 可任意指定，可能会和系统中的 API 产生冲突。例如：`/apis/plugin.halo.run/v1alpha1/plugins/**`。
+
+- [ ] `/api/plugins/{plugin-name}/{version}/**`
+
+  背离 API 构成规则，解析起来难度相对较大。
+
+- [x] `/api/{version}/plugins/{plugin-name}/**`
+
+  符合 API 构成规则，避免 API 冲突并且方便识别并解析。
+
 #### 插件依赖插件
 
 MVP(minimum viable product) 版本中不实现
