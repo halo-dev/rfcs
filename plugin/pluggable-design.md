@@ -392,7 +392,7 @@ TODO 细节待补充
   apiVersion: plugin.halo.run/v1alpha1
   kind: Plugin
   metadata:
-    name: johnniang-plugin
+    name: my-plugin
   ```
 
 - Apple 并不是插件的自定义模型
@@ -427,34 +427,33 @@ kind: Role
 metadata:
   name: apple-role
 rules:
+  # 插件自定义 API 规则配置
   - resources: ["apples"]
     verbs: ["create"]
     plugin: my-plugin # 新增 plugin 字段，主要为了区分当前规则是否匹配某个插件中自定义接口。
-  - apiGroups: ["plugin.halo.run"]
-    resources: ["plugins"]
-    verbs: ["create"]
+  # 常规规则配置
   - apiGroups: [""]
     resources: ["users"]
-    verbs: ["create", "get"]
+    verbs: ["list", "get"]
 ```
 
 ##### API 构成讨论
 
-- `/apis/{group}/{version}/plugins/{plugin-name}/**`
+- [ ] `/apis/{group}/{version}/plugins/{plugin-name}/**`
 
-由于 group 和 version 可任意指定，可能会和系统自动生成的 Plugin 的 API 冲突。例如：`/apis/plugin.halo.run/v1alpha1/plugins/my-plugin/**`。
+  由于 group 和 version 可任意指定，可能会和系统自动生成的 Plugin 的 API 冲突。例如：`/apis/plugin.halo.run/v1alpha1/plugins/my-plugin/**`。
 
-- `/apis/{plugin-name}/{version}/**`
+- [ ] `/apis/{plugin-name}/{version}/**`
 
-由于 plugin-name 可任意指定，可能会和系统中的 API 产生冲突。例如：`/apis/plugin.halo.run/v1alpha1/plugins/**`。
+  由于 plugin-name 可任意指定，可能会和系统中的 API 产生冲突。例如：`/apis/plugin.halo.run/v1alpha1/plugins/**`。
 
-- `/api/plugins/{plugin-name}/{version}/**`
+- [ ] `/api/plugins/{plugin-name}/{version}/**`
 
-背离 API 构成规则，解析起来难度相对较大。
+  背离 API 构成规则，解析起来难度相对较大。
 
-- `/api/{version}/plugins/{plugin-name}/**`
+- [x] `/api/{version}/plugins/{plugin-name}/**`
 
-符合 API 构成规则，避免 API 冲突并且方便识别并解析。
+  符合 API 构成规则，避免 API 冲突并且方便识别并解析。
 
 #### 插件依赖插件
 
