@@ -403,21 +403,21 @@ TODO 细节待补充
   @RequestMapping("/apples")
   @RestController
   public class AppleController {
-
+  
       @PostMapping("/starting")
       public void starting() {
       }
-
+  
   }
   ```
 
 当插件被注册时，我们将会为 AppleController 生成统一路径的 API。API 前缀组成规则如下：
 
 ```text
-/api/{version}/plugins/{plugin-name}/**
+/apis/plugin.api.halo.run/{version}/plugins/{plugin-name}/**
 ```
 
-例如：`/api/v1alpha1/plugins/my-plugin/apples/starting`。
+例如：`/apis/plugin.api.halo.run/v1alpha1/plugins/my-plugin/starting`。
 
 Role 配置样例如下：
 
@@ -427,13 +427,22 @@ kind: Role
 metadata:
   name: apple-role
 rules:
-  # 插件自定义 API 规则配置
-  - resources: ["apples"]
-    verbs: ["create"]
-    plugin: my-plugin # 新增 plugin 字段，主要为了区分当前规则是否匹配某个插件中自定义接口。
-  # 常规规则配置
-  - apiGroups: [""]
-    resources: ["users"]
+  - apiGroups: ["plugin.api.halo.run"]
+    resources: ["plugins/starting"]
+    verbs: ["list", "get"]
+```
+
+当存在 API 为 `/apis/plugin.api.halo.run/v1alpha1/plugins/my-plugin/users/some-username` 时，Role 配置示例如下：
+
+```yaml
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: some-role
+rules:
+  - apiGroups: ["plugin.api.halo.run"]
+    resources: ["plugins/users"]
+    name: "my-plugin/some-username"
     verbs: ["list", "get"]
 ```
 
@@ -451,9 +460,13 @@ rules:
 
   背离 API 构成规则，解析起来难度相对较大。
 
-- [x] `/api/{version}/plugins/{plugin-name}/**`
+- [ ] `/api/{version}/plugins/{plugin-name}/**`
 
-  符合 API 构成规则，避免 API 冲突并且方便识别并解析。
+  符合 API 构成规则，避免 API 冲突并且方便识别并解析，但与常规 Role 配置风格存在较大差异，需要特殊处理 plugins 作为 API 中的固定名词。
+
+- [x] `/apis/plugin.api.halo.run/v1alpha1/plugins/{plugin-name}/**`
+
+  符合 API 构成规则，避免 API 冲突并且方便识别并解析，通过固定 apiGroup 来作为插件自定义 APIs 的组成部分，符合语意：插件下的 APIs 为 plugins 的子资源。
 
 #### 插件依赖插件
 
