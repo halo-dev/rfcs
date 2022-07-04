@@ -123,7 +123,7 @@ metadata:
   annotations:
     halo.run/dependencies: ["role-template-view-categories"]
     halo.run/module: "Categories Management"
-    halo.run/alias-name: "Categories Management"
+    halo.run/display-name: "Categories Management"
 rules:
   - apiGroups: ["halo.run"]
     resources: ["categories"]
@@ -137,7 +137,7 @@ metadata:
     halo.run/role-template: true
   annotations:
     halo.run/module: "Posts Management"
-    halo.run/alias-name: "Posts View"
+    halo.run/display-name: "Posts View"
 rules:
   - apiGroups: ["halo.run"]
     resources: ["posts", categories","tags","options","settings","users"]
@@ -154,7 +154,7 @@ metadata:
     halo.run/dependencies:
       ["role-template-view-posts", "role-template-manage-categories"]
     halo.run/module: "Posts Management"
-    halo.run/alias-name: "Posts Management"
+    halo.run/display-name: "Posts Management"
 rules: []
 ---
 apiVersion: halo.run/v1
@@ -357,7 +357,7 @@ metadata:
   annotations:
     halo.run/dependencies: ["role-template-view-posts"]
     halo.run/module: "Posts Management"
-    halo.run/alias-name: "Posts Management"
+    halo.run/display-name: "Posts Management"
 rules:
   - apiGroups: ["halo.run"]
     resources: ["posts"]
