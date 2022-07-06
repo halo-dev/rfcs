@@ -8,14 +8,14 @@ Halo 的受众用户可能并不是懂技术的开发者，为了让用户能方
 
 ## 目标
 
-- 提供 ConfigMap API 对象
-- 提供主题和插件配置 API 对象
+- 提供 ConfigMap 自定义模型
+- 提供主题和插件配置自定义模型
 
 ## 设计
 
 ### ConfigMap
 
-ConfigMap 是一个 API [对象](https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/kubernetes-objects/)， 让你可以存储其他对象所需要使用的配置。 ConfigMap 使用 `data` 和 `binaryData` 字段。这些字段能够接收键-值对作为其取值。`data` 和 `binaryData` 字段都是可选的。`data` 字段设计用来保存 UTF-8 字符串，而 `binaryData` 则被设计用来保存二进制数据作为 base64 编码的字串。
+ConfigMap 是一个自定义模型， 让你可以存储其他对象所需要使用的配置。 ConfigMap 使用 `data` 和 `binaryData` 字段。这些字段能够接收键-值对作为其取值。`data` 和 `binaryData` 字段都是可选的。`data` 字段设计用来保存 UTF-8 字符串，而 `binaryData` 则被设计用来保存二进制数据作为 base64 编码的字串。
 
 ConfigMap 的名字必须是一个合法的 [DNS 子域名](https://kubernetes.io/zh-cn/docs/concepts/overview/working-with-objects/names#dns-subdomain-names)。`data` 或 `binaryData` 字段下面的每个键的名称都必须由字母数字字符或者 `-`、`_` 或 `.` 组成。在 `data` 下保存的键名不可以与在 `binaryData` 下出现的键名有重叠。
 
