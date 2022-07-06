@@ -70,57 +70,30 @@ spec:
 ```
 
 创建 `settings.yaml` 用于插件配置表单生成
-
-TODO 探索表单生成器方案
+格式示例如下：
 
 ```yaml
 apiVersion: theme.halo.run/v1alpha1
-kind: ThemeSetting
+kind: Setting
 metadata:
-  name: theme-settings-${GENERATE_ID}
+  name: theme-setting-${GENERATE_ID}
 spec:
   - group: sns
     label: 社交资料
-    items:
-      - name: telegram
-        label: Telegram
-        type: input
-        component:
-        	type: input
-        	attrubtes:
-        		type: number
-        		max: 100
-        		min: 1
-        		other: "{}"
-        placeholder: "Telegram 用户名"
-        rules:
-          - required: true
-            message: "请输入 Telegram 用户名"
-          - min: 1
-            message: "请输入 Telegram 用户名"
-          - max: 20
-            message: "Telegram 用户名不能超过 20 个字符"
-          - pattern: ^[a-zA-Z0-9_]+$
-            message: "请输入正确的 Telegram 用户名"
-      - name: github
-        label: GitHub
-        type: text
-        placeholder: "Github 用户名"
-      - name: rss
-        label: RSS
-        type: radio
-        data-type: bool
-        default: true
-        options:
-          - value: true
-            label: 开启
-          - value: false
-            label: 关闭
+    formSchema:
+      - $formkit: text
+        help: This will be used for your account.
+        label: Email
+        name: email
+        validation: required|email
+      - $formkit: password
+        help: Enter your new password.
+        label: Password
+        name: password
+        validation: required|length:5,16
 ```
 
-目前主题开发可以通过主题模板仓库生成。
-
-后续可以支持开发脚手架。
+目前主题开发仅可通过主题模板仓库生成。
 
 ### 主题预览
 
@@ -196,11 +169,17 @@ metadata:
   name: halo-theme-gtvg-settings
   labels:
     theme.halo.run/theme-name: THEME_NAME
-  	theme.halo.run/theme-settings-name: theme-settings-${GENERATE_ID}
+  	theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
 data:
-  sns.telegram: "guqings"
-  sns.github: "guqing"
-  sns.rss: "true"
+  setting: |
+   {
+      "sns": {
+        "email": "111",
+        "password": "xxx",
+        "password_confirm": "xxx",
+        "cookie_notice": ["hello", "world"]
+      }
+    }
 ```
 
 在 `metadata.labels` 中添加对 `theme-name` 和 `theme-settings-name` 的引用是为了便于通过配置的值来反向找到配置定义，便于做数据类型转换等操作。
