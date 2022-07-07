@@ -26,7 +26,7 @@
 
 ### 主题开发与工程化
 
-插件结构示例
+主题目录结构示例
 
 ```text
 ├── i18n
@@ -169,7 +169,7 @@ metadata:
   name: halo-theme-gtvg-settings
   labels:
     theme.halo.run/theme-name: THEME_NAME
-  	theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
+    theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
 data:
   setting: |
    {
@@ -356,3 +356,7 @@ return applyTemplateRawPostProcessors(raw);
 4. 评论显示不实时
 
 为了加快网站的访问速度，可以使用模板渲染缓存来实现。
+
+### 主题更新
+
+TBD.
