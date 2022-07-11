@@ -32,6 +32,8 @@ data:
   #...
 ```
 
+参考：[Kubernetes ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/)
+
 ### 主题配置
 
 主题配置示例：
