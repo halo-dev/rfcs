@@ -24,7 +24,7 @@ ConfigMap 将你的环境配置信息同主题和插件等解耦，便于应用�
 ConfigMap 并不提供保密或者加密功能。
 
 ```yaml
-apiVersion: v1
+apiVersion: v1alpha1
 kind: ConfigMap
 metadata:
   name: game-demo
@@ -38,10 +38,10 @@ data:
 
 `formSchema` 遵循 [Formkit form generation](https://formkit.com/essentials/generation)
 
-`apiVersion` 固定为`theme.halo.run/v1alpha1`
+`apiVersion` 固定为 `core.halo.run/v1alpha1`
 
 ```yaml
-apiVersion: theme.halo.run/v1alpha1
+apiVersion: core.halo.run/v1alpha1
 kind: Setting
 metadata:
   name: theme-setting-${GENERATE_ID}
@@ -175,8 +175,6 @@ spec:
 
 - `theme.halo.run/theme-name` 表示主题名称
 
-- `theme.halo.run/theme-setting-name` 表示主题配置的名称
-
 ```yaml
 apiVersion: v1alpha1
 kind: ConfigMap
@@ -184,7 +182,6 @@ metadata:
   name: halo-theme-gtvg-setting
   labels:
     theme.halo.run/theme-name: THEME_NAME
-    theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
 data:
   setting: |
     {
@@ -201,10 +198,10 @@ data:
 
 ### 插件配置
 
-插件配置与主题大致相同，`apiVersion` 为 `plugin.halo.run/v1alpha1`
+插件配置与主题大致相同
 
 ```yaml
-apiVersion: plugin.halo.run/v1alpha1
+apiVersion: core.halo.run/v1alpha1
 kind: Setting
 metadata:
   name: plugin-setting-${GENERATE_ID}
@@ -224,7 +221,6 @@ metadata:
   name: halo-plugin-link-setting-value
   labels:
     plugin.halo.run/plugin-name: PLUGIN_NAME
-    plugin.halo.run/plugin-setting-name: plugin-setting-${GENERATE_ID}
 data:
   setting: |
    {}
