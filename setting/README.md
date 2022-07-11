@@ -184,10 +184,10 @@ metadata:
   name: halo-theme-gtvg-setting
   labels:
     theme.halo.run/theme-name: THEME_NAME
-  	theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
+    theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
 data:
   setting: |
-  	{
+    {
       "sns": {
         "email": "111",
         "password": "xxx",
@@ -224,7 +224,7 @@ metadata:
   name: halo-plugin-link-setting-value
   labels:
     plugin.halo.run/plugin-name: PLUGIN_NAME
-  	plugin.halo.run/plugin-setting-name: plugin-setting-${GENERATE_ID}
+    plugin.halo.run/plugin-setting-name: plugin-setting-${GENERATE_ID}
 data:
   setting: |
    {}
