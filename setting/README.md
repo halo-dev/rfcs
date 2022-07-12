@@ -44,9 +44,7 @@ data:
 apiVersion: v1alpha1
 kind: Setting
 metadata:
-  name: theme-setting-${GENERATE_ID}
-  labels:
-    theme.halo.run/configmap-name: CONFIG_MAP_NAME
+  name: theme-setting-test
 spec:
   - group: sns
     label: 社交资料
@@ -84,7 +82,7 @@ spec:
           refresh: Every page load
 ```
 
-根据如上配置将生成形如以下格式 HTML
+根据如上 Setting 配置将生成形如以下格式 HTML
 
 ```html
 <form class="formkit-form" id="input_0" name="form_1">
@@ -172,17 +170,35 @@ spec:
 {}
 </pre>
 ```
+在主题描述文件中关联 Setting 和 ConfigMap
+```yaml
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: gtvg
+spec:
+  displayName: GTVG
+  author:
+    name: guqing
+    website: https://guqing.xyz
+  description: 测试主题
+  logo: https://guqing.xyz/logo.png
+  website: https://github.com/guqing/halo-theme-test.git
+  repo: https://github.com/guqing/halo-theme-test.git
+  version: 1.0.0
+  require: 2.0.0
+  setting-name: theme-setting-test
+  configmap-name: theme-configmap-test
+```
+当 Setting 名为 `theme-setting-test` 的表单被提交时其表单值会被保存到名称为 `theme-configmap-test` 的 ConfigMap 中。
 
-表单提交后得到值将被存储为 `ConfigMap` ，其中 `data.setting` 为表单的 `JSON` 格式，其中 labels
-`theme.halo.run/theme-name` 表示主题名称
+`ConfigMap` 的格式如下，其中 `data.setting` 为表单的 `JSON` 格式
 
 ```yaml
 apiVersion: v1alpha1
 kind: ConfigMap
 metadata:
-  name: halo-theme-gtvg-setting
-  labels:
-    theme.halo.run/theme-name: THEME_NAME
+  name: theme-configmap-test
 data:
   setting: |
     {
@@ -205,9 +221,7 @@ data:
 apiVersion: v1alpha1
 kind: Setting
 metadata:
-  name: plugin-setting-${GENERATE_ID}
-  labels:
-    plugin.halo.run/configmap-name: CONFIG_MAP_NAME
+  name: plugin-setting-name
 spec:
   - group: default
     label: 默认配置
@@ -221,9 +235,7 @@ spec:
 apiVersion: v1alpha1
 kind: ConfigMap
 metadata:
-  name: halo-plugin-link-setting-value
-  labels:
-    plugin.halo.run/plugin-name: PLUGIN_NAME
+  name: plugin-setting-configmap
 data:
   setting: |
    {}
