@@ -40,13 +40,13 @@ data:
 
 `formSchema` 遵循 [Formkit form generation](https://formkit.com/essentials/generation)
 
-`apiVersion` 固定为 `core.halo.run/v1alpha1`
-
 ```yaml
-apiVersion: core.halo.run/v1alpha1
+apiVersion: v1alpha1
 kind: Setting
 metadata:
   name: theme-setting-${GENERATE_ID}
+  labels:
+    theme.halo.run/configmap-name: CONFIG_MAP_NAME
 spec:
   - group: sns
     label: 社交资料
@@ -173,9 +173,8 @@ spec:
 </pre>
 ```
 
-表单提交后得到值将被存储为 `ConfigMap` ，其中 `data.setting` 为表单的 `JSON` 格式，`metadata.labels` 必须存在两个 key
-
-- `theme.halo.run/theme-name` 表示主题名称
+表单提交后得到值将被存储为 `ConfigMap` ，其中 `data.setting` 为表单的 `JSON` 格式，其中 labels
+`theme.halo.run/theme-name` 表示主题名称
 
 ```yaml
 apiVersion: v1alpha1
@@ -203,10 +202,12 @@ data:
 插件配置与主题大致相同
 
 ```yaml
-apiVersion: core.halo.run/v1alpha1
+apiVersion: v1alpha1
 kind: Setting
 metadata:
   name: plugin-setting-${GENERATE_ID}
+  labels:
+    plugin.halo.run/configmap-name: CONFIG_MAP_NAME
 spec:
   - group: default
     label: 默认配置
