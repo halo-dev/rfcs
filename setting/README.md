@@ -192,7 +192,7 @@ spec:
 ```
 当 Setting 名为 `theme-setting-test` 的表单被提交时其表单值会被保存到名称为 `theme-configmap-test` 的 ConfigMap 中。
 
-`ConfigMap` 的格式如下，其中 `data.setting` 为表单的 `JSON` 格式
+`ConfigMap` 的格式如下：
 
 ```yaml
 apiVersion: v1alpha1
@@ -200,18 +200,19 @@ kind: ConfigMap
 metadata:
   name: theme-configmap-test
 data:
-  setting: |
+  sns: |
     {
-      "sns": {
-        "email": "111",
-        "password": "xxx",
-        "password_confirm": "xxx",
-        "cookie_notice": ["hello", "world"]
-      }
+      "email": "111",
+      "password": "xxx",
+      "password_confirm": "xxx",
+      "cookie_notice": ["hello", "world"]
+    }
+  basic: |
+    {
+      "color": "red"
     }
 ```
-
-使用值时会获取到`data.setting` 的值，它是 `JSON` 对象。
+data 中的每个 key 都表示 group name，而 value 为 group 下的表单值 JSON。
 
 ### 插件配置
 
@@ -237,6 +238,6 @@ kind: ConfigMap
 metadata:
   name: plugin-setting-configmap
 data:
-  setting: |
+  some-group: |
    {}
 ```
