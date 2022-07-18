@@ -49,7 +49,7 @@
 └── theme.yaml
 ```
 
-创建主题描述文件 `theme.yaml`
+创建主题描述文件 `theme.yaml`，示例如下：
 
 ```yaml
 apiVersion: theme.halo.run/v1alpha1
@@ -69,29 +69,7 @@ spec:
   require: 2.0.0
 ```
 
-创建 `settings.yaml` 用于插件配置表单生成
-格式示例如下：
-
-```yaml
-apiVersion: theme.halo.run/v1alpha1
-kind: Setting
-metadata:
-  name: theme-setting-${GENERATE_ID}
-spec:
-  - group: sns
-    label: 社交资料
-    formSchema:
-      - $formkit: text
-        help: This will be used for your account.
-        label: Email
-        name: email
-        validation: required|email
-      - $formkit: password
-        help: Enter your new password.
-        label: Password
-        name: password
-        validation: required|length:5,16
-```
+如果主题需要生成配置表单，则创建 `settings.yaml` 文件，示例参考： [Setting RFC](https://github.com/halo-dev/rfcs/blob/main/setting/README.md)
 
 目前主题开发仅可通过主题模板仓库生成。
 
@@ -126,19 +104,19 @@ spec:
 />
 ```
 
-对于模板路径
+当使用 `@route{}` 语法时
 
 ```html
 <a th:href="@route{/posts}">Next</a>
 ```
 
-渲染后，对于激活的主题，实际内容如下
+对于激活的主题，渲染后得到实际内容如下
 
 ```html
 <a href="/posts">Next</a>
 ```
 
-当开起主题预览时会染内容如下
+当开启主题预览后会染内容如下
 
 ```html
 <a href="/themes/{THEME_ID}/posts">Next</a>
@@ -148,41 +126,19 @@ spec:
 
 ### 主题安装
 
-通过上传 `Zip` 压缩文件到 Halo `workdir`的 `themes` 目录或拷贝解压缩后的主题目录到此 `themes` 目录。
+通过上传 `Zip` 压缩文件到 Halo 的 `${workdir}/themes` 目录或拷贝解压缩后的主题目录到此 `themes` 目录。
 
 文件夹名称应该为主题名称。
 
 ### 主题切换
 
-主题同时只能有一个被启用，当修改了正在使用的主题时，模板文件渲染指向的路径切换到被启用的主题目录。
+主题同时只能有一个被启用，当修改了正在使用的主题后，模板文件渲染指向的路径切换到被启用的主题目录。
 
-激活的主题挂载到根目录
+激活的主题则挂载到根路径
 
 ### 主题配置
 
-管理端通过解析 `settings.yaml `中的配置生成动态表单，填写后点击保存会将所有值保存到一个 ConfigMap 中。示例如下：
-
-```yaml
-apiVersion: v1alpha1
-kind: ConfigMap
-metadata:
-  name: halo-theme-gtvg-settings
-  labels:
-    theme.halo.run/theme-name: THEME_NAME
-    theme.halo.run/theme-setting-name: theme-setting-${GENERATE_ID}
-data:
-  setting: |
-   {
-      "sns": {
-        "email": "111",
-        "password": "xxx",
-        "password_confirm": "xxx",
-        "cookie_notice": ["hello", "world"]
-      }
-    }
-```
-
-在 `metadata.labels` 中添加对 `theme-name` 和 `theme-settings-name` 的引用是为了便于通过配置的值来反向找到配置定义，便于做数据类型转换等操作。
+管理端通过解析 `settings.yaml `中的配置生成动态表单，填写后点击保存会将所有值保存到一个 ConfigMap 中。详情参考 [主题配置](https://github.com/halo-dev/rfcs/blob/main/setting/README.md#%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE)
 
 ### 主题国际化
 
@@ -195,7 +151,13 @@ data:
 │   └── en.properties
 ```
 
-`i18n`目录表示此目录下的 `.properties` 文件多语言配置，`default.properties` 表示默认语言时使用的文件，`en.properties`表示 `Locale` 的语言为 `English` 时使用的配置文件，命名规则为 `{language}.properties`，`language` 遵循 [ISO 639 alpha-2 or alpha-3 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)，语言字段不区分大小写，但语言环境总是规范化为小写，`default.properties`除外，它是找不到对应语言环境时默认使用的语言包。
+`i18n`目录表示此目录下的 `.properties` 文件多语言配置：
+
+- `default.properties` 表示默认语言时使用的文件。
+
+- `en.properties`表示 `Locale` 的语言为 `English` 时使用的配置文件。
+
+命名规则为 `{language}.properties`，`language` 遵循 [ISO 639 alpha-2 or alpha-3 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)，语言字段不区分大小写，但语言环境总是规范化为小写，`default.properties`除外，它是找不到对应语言环境时默认使用的语言包。
 
 示例："en" (English), "ja" (Japanese), "kok" (Konkani)
 
@@ -223,26 +185,26 @@ public String renderPosts(PostParam postParam) {
 }
 ```
 
-2. 使用
+2. 使用方法
 
 - 直接使用变量
 
-```html
-<div th:each="post in posts">
-  <div th:text="${post.name}"></div>
-</div>
-```
+  ```html
+  <div th:each="post in posts">
+    <div th:text="${post.name}"></div>
+  </div>
+  ```
 
-- 调用方法
+- 允许调用方法
 
-```html
-<div
-  th:with="posts=${postService.list(page, size, sort)}"
-  th:each="post in posts"
->
-  <div th:text="${post.name}"></div>
-</div>
-```
+  ```html
+  <div
+    th:with="posts=${postService.list(page, size, sort)}"
+    th:each="post in posts"
+  >
+    <div th:text="${post.name}"></div>
+  </div>
+  ```
 
 附录：
 
