@@ -468,6 +468,53 @@ rules:
 
   符合 API 构成规则，避免 API 冲突并且方便识别并解析，通过固定 apiGroup 来作为插件自定义 APIs 的组成部分，符合语意：插件下的 APIs 为 plugins 的子资源。
 
+#### 插件静态资源代理
+
+插件允许通过 `ReverseProxy` 自定义模型来配置静态资源代理规则
+
+假如插件 `plugin-links` 配置了如下的 `ReverseProxy` 资源
+
+```yaml
+apiVersion: plugin.halo.run/v1alpha1
+kind: ReverseProxy
+metadata:
+  name: reverse-proxy-template
+rules:
+  - path: /res/**
+    file:
+      directory: static
+      # filename: halo.png
+```
+
+那么插件被启用后，访问 `/assets/plugin-links/res/halo.png` 会将插件 `src/main/resources/static` 下的 `halo.png` 文件返回，如果不存在则返回 `404`。
+
+`rules` 中
+
+- `path` 表示访问路径规则，最终会根据 `path` 生成实际访问路径，生成规则为：`/assets/{plugin-name}/{path}`
+- `file` 表示代理规则为文件系统
+- `file.directory` 表示将 `path` 中 `/**` 的通配符规则指向一个目录
+- `file.filename` 表示将 `path` 指向一个具体的文件
+
+插件启动后如果在插件中的 `src/main/resources/admin` 目录下存在 `main.js` 或 `style.css` 文件则会自动注册相应的代理规则：
+
+```yaml
+apiVersion: plugin.halo.run/v1alpha1
+kind: ReverseProxy
+metadata:
+  name: a-generated-name
+rules:
+  - path: /admin/main.js
+    file:
+      directory: admin
+      filename: main.js
+  - path: /admin/style.css
+    file:
+      directory: admin
+      filename: style.css
+```
+
+这两个文件由插件的前端工程打包后生成，用于为插件提供前端界面和交互能力。
+
 #### 插件依赖插件
 
 MVP(minimum viable product) 版本中不实现
