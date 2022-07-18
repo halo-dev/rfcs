@@ -16,11 +16,11 @@
 - 主题配置
 - 主题国际化
 - 主题扩展
+- 主题更新
 
 ## 非目标
 
 - 页面静态化
-- 主题更新
 
 ## 设计
 
@@ -128,7 +128,12 @@ spec:
 
 通过上传 `Zip` 压缩文件到 Halo 的 `${workdir}/themes` 目录或拷贝解压缩后的主题目录到此 `themes` 目录。
 
-文件夹名称应该为主题名称。
+主题安装的 Endpoint:
+
+```sh
+curl --location --request POST '/apis/api.halo.run/v1alpha1/themes' \
+--form 'file=@"/path/to/file"'
+```
 
 ### 主题切换
 
@@ -136,9 +141,27 @@ spec:
 
 激活的主题则挂载到根路径
 
+切换主题的 Endpoint:
+
+```sh
+curl --location --request PUT '/apis/api.halo.run/v1alpha1/themes/{name}/activation'
+```
+
 ### 主题配置
 
 管理端通过解析 `settings.yaml `中的配置生成动态表单，填写后点击保存会将所有值保存到一个 ConfigMap 中。详情参考 [主题配置](https://github.com/halo-dev/rfcs/blob/main/setting/README.md#%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE)
+
+获取主题表单设置的 Endpoint:
+
+```sh
+curl --location --request GET '/api/v1alpha1/settings/{name}'
+```
+
+获取主题设置表单值的 Endpoint:
+
+```sh
+curl --location --request GET '/api/v1alpha1/configmaps/{name}'
+```
 
 ### 主题国际化
 
@@ -305,6 +328,11 @@ String raw = render(template, model);
 return applyTemplateRawPostProcessors(raw);
 ```
 
+### 主题更新
+
+1. 通过上传主题 `ZIP` 包进行覆盖更新
+2. TBD.
+
 ### 页面静态化
 
 页面静态化应该只是一个可选项，允许用户设置是否开启。
@@ -318,7 +346,3 @@ return applyTemplateRawPostProcessors(raw);
 4. 评论显示不实时
 
 为了加快网站的访问速度，可以使用模板渲染缓存来实现。
-
-### 主题更新
-
-TBD.
