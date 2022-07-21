@@ -103,6 +103,7 @@ Halo 将覆盖 Thymeleaf 提供的 `@{}` 表达式链接生成逻辑以便于对
   href="/themes/{THEME_ID}/assets/css/gtvg.css"
 />
 ```
+
 模版页面链接写法与 Thymeleaf 无差别：
 
 ```html
@@ -118,7 +119,7 @@ Halo 将覆盖 Thymeleaf 提供的 `@{}` 表达式链接生成逻辑以便于对
 当开启主题预览后渲染内容如下
 
 ```html
-<a href="/themes/{THEME_ID}/posts">Next</a>
+<a href="/posts?theme=THEME_NAME">Next</a>
 ```
 
 从而实现主题预览而无须先启用主题。
