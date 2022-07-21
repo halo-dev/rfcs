@@ -79,17 +79,17 @@ spec:
 
 为了防止模板被下载，静态资源的访问将被限制在`src/assets/**`目录下，即只会对外暴露主题的 `src/assets/` 目录。
 
-并定义两种链接表达式来代替 Thymeleaf 提供的 `@{}` 表达式以便于对启用主题和未启用主题的访问进行处理。
+Halo 将覆盖 Thymeleaf 提供的 `@{}` 表达式链接生成逻辑以便于对启用主题和未启用主题的访问进行处理。
 
-定义静态资源表达式方言如下：
+静态资源链接写法必须以 assets 开头，如下：
 
 ```html
-<!-- 语法：@assets{/css/gtvg.css} -->
+<!-- 语法：@{/assets/css/gtvg.css} -->
 <link
   rel="stylesheet"
   type="text/css"
   media="all"
-  th:href="@assets{/css/gtvg.css}"
+  th:href="@{/assets/css/gtvg.css}"
 />
 ```
 
@@ -104,10 +104,10 @@ spec:
 />
 ```
 
-当使用 `@route{}` 语法时
+模版页面链接写法与 Thymeleaf 无差别：
 
 ```html
-<a th:href="@route{/posts}">Next</a>
+<a th:href="@{/posts}">Next</a>
 ```
 
 对于激活的主题，渲染后得到实际内容如下
@@ -116,10 +116,10 @@ spec:
 <a href="/posts">Next</a>
 ```
 
-当开启主题预览后会染内容如下
+当开启主题预览后渲染内容如下
 
 ```html
-<a href="/themes/{THEME_ID}/posts">Next</a>
+<a href="/posts?theme=THEME_NAME">Next</a>
 ```
 
 从而实现主题预览而无须先启用主题。
