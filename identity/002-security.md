@@ -227,6 +227,7 @@ API 资源应该使用传统的 REST 模式：
 - DELETE `/<resourceNamePlural>/<name>` - 删除具有给定名称的单个资源。
 - DELETE `/<resourceNamePlural>` - 删除 `<resourceName>` 类型的列表，例如 DELETE /categories 一个 Category 列表。
 - PUT `/<resourceNamePlural>/<name>` - 使用客户端提供的 JSON 对象更新或创建具有给定名称的资源。
+- PUT `/<resourceNamePlural>/<name>/<action>` - 更新给定名称的资源的数据。例如 `PUT /plugins/s3/enabled` 可表示启用 S3 插件。
 - PATCH `/<resourceNamePlural>/<name>` - 有选择地修改资源的指定字段。
 
 #### 确定请求动词
