@@ -130,12 +130,12 @@ metadata:
   name: thumbnail-1
 spec:
   imageSignature: e99a18c428cb38d5f260853678922e03
-  imageUrl: /path/to/original.jpg
+  imageUri: /path/to/original.jpg
   size: L
-  thumbnailUrl: /path/to/thumbnail-L.jpg
+  thumbnailUri: /path/to/thumbnail-L.jpg
 ```
 
-基于 `imageUrl` 生成的 MD5 签名，然后为 `imageSignature` 和 `size` 建立组合索引，一方面可以显著提高查询性能，同时也可以减少索引的大小。
+基于 `imageUri` 生成的 MD5 签名，然后为 `imageSignature` 和 `size` 建立组合索引，一方面可以显著提高查询性能，同时也可以减少索引的大小。
 
 ```java
 indexSpec.add(new IndexSpec()
@@ -218,7 +218,7 @@ metadata:
   name: local-thumbnail-1
 spec:
   imageSignature: e99a18c428cb38d5f260853678922e03
-  imageUrl: /path/to/original.jpg
+  imageUri: /path/to/original.jpg
   thumbnailUri: /path/to/thumbnail-L.jpg
   thumbSignature: e99a18c428cb38d5f260853678922e03
   filePath: /attachments/thumbnails/2024/w1200/2024-08-09.jpg
@@ -325,19 +325,19 @@ private static String doGetFormatName(URL input) throws IOException {
 
 ```html
 <img
-  th:src="${imageUrl}"
+  th:src="${imageUri}"
   th:srcset="|
-      ${#thumbnail.for(imageUrl, 's')} 400w,
-      ${#thumbnail.for(imageUrl, 'm')} 800w,
-      ${#thumbnail.for(imageUrl, 'l')} 1200w,
-      ${#thumbnail.for(imageUrl, 'xl')} 1600w
+      ${thumbnail.gen(imageUri, 's')} 400w,
+      ${thumbnail.gen(imageUri, 'm')} 800w,
+      ${thumbnail.gen(imageUri, 'l')} 1200w,
+      ${thumbnail.gen(imageUri, 'xl')} 1600w
    |"
   sizes="(max-width: 1600px) 100vw, 1600px"
   alt="Example Image"
 />
 ```
 
-通过调用 `thumbnail.for(imageUrl, size)` 方法，开发者可以简便地生成缩略图 URL，并将其应用在 `srcset` 中，实现图片的响应式加载。
+通过调用 `thumbnail.gen(imageUri, size)` 方法，开发者可以简便地生成缩略图 URL，并将其应用在 `srcset` 中，实现图片的响应式加载。
 
 #### 文章内容中的图片
 
